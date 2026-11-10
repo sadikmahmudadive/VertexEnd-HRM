@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "545830925830",
+    "project_id": "vertexhand-demo",
+    "storage_bucket": "vertexhand-demo.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:545830925830:android:0fc84a3ea7c049eedd3587",
+        "android_client_info": {
+          "package_name": "com.vertexhand.vertexhand_hrm"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "545830925830-r9gjtg1f6c2nepsh3bbj3ndnk3gc7jvl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6779ihwCIvck9KDW6SPXiT1eBM77HtTM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "545830925830-r9gjtg1f6c2nepsh3bbj3ndnk3gc7jvl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
