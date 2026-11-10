@@ -1,0 +1,56 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is signed in
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Super Admin & Staff Users
+    match /users/{userId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Company Workspaces
+    match /companies/{companyCode} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Live Attendance & Clock Punches
+    match /attendance/{attendanceId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Outwork & Field Duty Requests
+    match /outwork_requests/{requestId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Leave Applications
+    match /leave_requests/{leaveId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Expense Claims & Receipts
+    match /expenses/{expenseId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Company Announcements & Notices
+    match /announcements/{announcementId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // RBAC Roles & Custom Permissions
+    match /roles/{roleId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Catch-all rule for authenticated users
+    match /{document=**} {
+      allow read, write: if isAuthenticated();
+    }
+  }
+}

@@ -92,6 +92,8 @@ interface HrmStoreContextType {
   stats: DashboardStats;
   darkMode: boolean;
   toggleDarkMode: () => void;
+  firestoreRulesLocked: boolean;
+  setFirestoreRulesLocked: (val: boolean) => void;
   // Auth Mutations
   registerSuperAdmin: (params: RegisterParams) => Promise<{ success: boolean; error?: string }>;
   signInWithGoogle: (companyMeta?: { companyName: string; companyCode: string }) => Promise<{ success: boolean; error?: string }>;
@@ -128,6 +130,7 @@ export function HrmStoreProvider({ children }: { children: React.ReactNode }) {
   const [expenseClaims, setExpenseClaims] = useState<ExpenseClaim[]>(INITIAL_EXPENSES);
   const [announcements, setAnnouncements] = useState<Announcement[]>(INITIAL_ANNOUNCEMENTS);
   const [darkMode, setDarkMode] = useState<boolean>(true);
+  const [firestoreRulesLocked, setFirestoreRulesLocked] = useState<boolean>(false);
 
   // Restore theme mode and cached session on mount
   useEffect(() => {
@@ -167,6 +170,14 @@ export function HrmStoreProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!isFirebaseConfigured) return;
 
+    const handlePermissionNotice = (msg: string, err: any) => {
+      console.warn(msg, err?.message || err);
+      const str = String(err?.message || err || '').toLowerCase();
+      if (err?.code === 'permission-denied' || str.includes('permission') || str.includes('insufficient')) {
+        setFirestoreRulesLocked(true);
+      }
+    };
+
     try {
       // Auth listener
       const unsubAuth = onAuthStateChanged(auth, async (user) => {
@@ -202,7 +213,7 @@ export function HrmStoreProvider({ children }: { children: React.ReactNode }) {
               localStorage.setItem('vh_super_admin_user', JSON.stringify(adminProfile));
             }
           } catch (e) {
-            console.warn('Error fetching Firestore user profile:', e);
+            handlePermissionNotice('Error fetching Firestore user profile:', e);
             if (user.email) {
               const adminProfile: AdminUser = {
                 uid: user.uid,
@@ -245,7 +256,7 @@ export function HrmStoreProvider({ children }: { children: React.ReactNode }) {
           });
           setEmployees(list);
         },
-        (err) => console.warn('Firestore users stream notice:', err.message)
+        (err) => handlePermissionNotice('Firestore users stream notice:', err)
       );
 
       // Outwork stream
@@ -271,7 +282,7 @@ export function HrmStoreProvider({ children }: { children: React.ReactNode }) {
           });
           setOutworkRequests(list);
         },
-        (err) => console.warn('Firestore outwork stream notice:', err.message)
+        (err) => handlePermissionNotice('Firestore outwork stream notice:', err)
       );
 
       // Leave requests stream
@@ -297,7 +308,7 @@ export function HrmStoreProvider({ children }: { children: React.ReactNode }) {
           });
           setLeaveRequests(list);
         },
-        (err) => console.warn('Firestore leaves stream notice:', err.message)
+        (err) => handlePermissionNotice('Firestore leaves stream notice:', err)
       );
 
       // Expense claims stream
@@ -322,7 +333,7 @@ export function HrmStoreProvider({ children }: { children: React.ReactNode }) {
           });
           setExpenseClaims(list);
         },
-        (err) => console.warn('Firestore expenses stream notice:', err.message)
+        (err) => handlePermissionNotice('Firestore expenses stream notice:', err)
       );
 
       // Attendance stream
@@ -350,7 +361,7 @@ export function HrmStoreProvider({ children }: { children: React.ReactNode }) {
           });
           setAttendance(list);
         },
-        (err) => console.warn('Firestore attendance stream notice:', err.message)
+        (err) => handlePermissionNotice('Firestore attendance stream notice:', err)
       );
 
       // Announcements stream
@@ -371,7 +382,7 @@ export function HrmStoreProvider({ children }: { children: React.ReactNode }) {
           });
           setAnnouncements(list);
         },
-        (err) => console.warn('Firestore announcements stream notice:', err.message)
+        (err) => handlePermissionNotice('Firestore announcements stream notice:', err)
       );
 
       // Roles stream
@@ -401,7 +412,7 @@ export function HrmStoreProvider({ children }: { children: React.ReactNode }) {
             setRoles(list);
           }
         },
-        (err) => console.warn('Firestore roles stream notice:', err.message)
+        (err) => handlePermissionNotice('Firestore roles stream notice:', err)
       );
 
       return () => {
@@ -863,6 +874,8 @@ export function HrmStoreProvider({ children }: { children: React.ReactNode }) {
         stats,
         darkMode,
         toggleDarkMode,
+        firestoreRulesLocked,
+        setFirestoreRulesLocked,
         registerSuperAdmin,
         signInWithGoogle,
         signInEmail,

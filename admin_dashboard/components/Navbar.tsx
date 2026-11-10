@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Search, Bell, Plus, Cloud, ShieldCheck } from 'lucide-react';
+import { Search, Bell, Plus, Cloud, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { isFirebaseConfigured } from '@/lib/firebase';
 import { useHrmAdmin } from '@/lib/store';
 
@@ -9,14 +9,16 @@ interface NavbarProps {
   onAddEmployee?: () => void;
   onNewAnnouncement?: () => void;
   onSearchChange?: (q: string) => void;
+  onOpenRulesModal?: () => void;
 }
 
 export default function Navbar({
   onAddEmployee,
   onNewAnnouncement,
   onSearchChange,
+  onOpenRulesModal,
 }: NavbarProps) {
-  const { currentUser } = useHrmAdmin();
+  const { currentUser, firestoreRulesLocked } = useHrmAdmin();
 
   return (
     <header className="h-16 border-b border-slate-200/70 dark:border-white/[0.06] bg-white/70 dark:bg-[#090d16]/70 backdrop-blur-xl sticky top-0 z-30 px-6 flex items-center justify-between transition-colors">
@@ -40,10 +42,21 @@ export default function Navbar({
       <div className="flex items-center gap-3">
         {/* Backend & Cloudinary Status Badges */}
         <div className="hidden lg:flex items-center gap-2">
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>{isFirebaseConfigured ? 'Firestore Live' : 'Live Sync Ready'}</span>
-          </div>
+          {firestoreRulesLocked ? (
+            <button
+              onClick={onOpenRulesModal}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/25 transition-all cursor-pointer"
+              title="Click to view and copy Firestore rules"
+            >
+              <AlertTriangle className="w-3 h-3 text-amber-500 shrink-0" />
+              <span>Rules Locked · Fix</span>
+            </button>
+          ) : (
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>{isFirebaseConfigured ? 'Firestore Live' : 'Live Sync Ready'}</span>
+            </div>
+          )}
 
           <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20">
             <Cloud className="w-3 h-3 text-sky-500" />
